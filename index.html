@@ -44,6 +44,88 @@
 
     html { scroll-behavior: smooth; }
 
+    /* ── CONTACT MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: var(--bg-3);
+      border: 1px solid var(--gold-border);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 100%;
+      position: relative;
+      animation: modalIn 0.35s var(--ease-out-expo);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--white-70);
+      font-size: 28px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--gold); }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .modal-sub {
+      color: var(--white-70);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .modal-form .form-group { margin-bottom: 14px; }
+    .modal-form input,
+    .modal-form select,
+    .modal-form textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--white-15);
+      border-radius: 8px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: border-color 0.25s;
+      outline: none;
+    }
+    .modal-form input:focus,
+    .modal-form select:focus,
+    .modal-form textarea:focus {
+      border-color: var(--gold);
+    }
+    .modal-form input::placeholder,
+    .modal-form textarea::placeholder {
+      color: var(--white-40);
+    }
+    .modal-form select {
+      appearance: none;
+      color: var(--white-40);
+    }
+    .modal-form select:valid { color: var(--white); }
+    .modal-form textarea { resize: vertical; min-height: 70px; }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: var(--bg);
@@ -1459,7 +1541,7 @@
       <li><a href="#team" onclick="closeNav()">Team</a></li>
       <li><a href="#pricing" onclick="closeNav()">Pricing</a></li>
     </ul>
-    <a href="#pricing" class="nav-cta">Book a Call</a>
+    <a href="#" class="nav-cta" onclick="openModal(event)">Book a Call</a>
     <button class="nav-toggle" id="navToggle" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -1482,7 +1564,7 @@
     </p>
 
     <div class="hero-ctas">
-      <a href="#pricing" class="btn-primary">Book My Free Strategy Call →</a>
+      <a href="#" class="btn-primary" onclick="openModal(event)">Book My Free Strategy Call →</a>
       <a href="#how" class="btn-secondary">
         <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         See How It Works
@@ -1731,7 +1813,7 @@
             <li>Monthly performance review</li>
             <li>Email support</li>
           </ul>
-          <a href="#" class="pricing-btn outline">Get Started →</a>
+          <a href="#" class="pricing-btn outline" onclick="openModal(event, 'Starter ($2,997/mo)')">Get Started →</a>
         </div>
 
         <!-- Pro -->
@@ -1751,7 +1833,7 @@
             <li>Weekly strategy calls</li>
             <li>Priority Slack support</li>
           </ul>
-          <a href="#" class="pricing-btn filled">Book My Strategy Call →</a>
+          <a href="#" class="pricing-btn filled" onclick="openModal(event, 'Pro Agent ($5,997/mo)')">Book My Strategy Call →</a>
         </div>
 
         <!-- Enterprise -->
@@ -1770,7 +1852,7 @@
             <li>On-call support (Slack + phone)</li>
             <li>Custom SLA & uptime guarantee</li>
           </ul>
-          <a href="#" class="pricing-btn outline">Contact Us →</a>
+          <a href="#" class="pricing-btn outline" onclick="openModal(event, 'Enterprise (Custom)')">Contact Us →</a>
         </div>
       </div>
 
@@ -1847,10 +1929,63 @@
       <span class="section-label">Let's Build</span>
       <h2>Stop losing leads.<br /><span class="gold-text">Start closing them.</span></h2>
       <p>Every hour without an AI agent is revenue walking out the door. Your free strategy call is 30 minutes that could change your business.</p>
-      <a href="#" class="btn-primary">Book My Free Strategy Call →</a>
+      <a href="#" class="btn-primary" onclick="openModal(event)">Book My Free Strategy Call →</a>
       <p class="final-cta-small">Free 30-minute call · No obligation · 48-hour deployment</p>
     </div>
   </section>
+
+  <!-- CONTACT MODAL -->
+  <div class="modal-overlay" id="contactModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h3 class="modal-title">Book Your Free <span class="gold-text">Strategy Call</span></h3>
+      <p class="modal-sub">Tell us about your business and we'll reach out within 24 hours to schedule your call.</p>
+      <form action="https://formsubmit.co/info@triasai.io" method="POST" class="modal-form">
+        <!-- FormSubmit config -->
+        <input type="hidden" name="_subject" value="New Strategy Call Request — Trias AI">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="https://triasai.io/?thanks=1">
+        <input type="text" name="_honey" style="display:none">
+        
+        <div class="form-group">
+          <input type="text" name="name" placeholder="Your Name" required>
+        </div>
+        <div class="form-group">
+          <input type="email" name="email" placeholder="Email Address" required>
+        </div>
+        <div class="form-group">
+          <input type="tel" name="phone" placeholder="Phone Number (optional)">
+        </div>
+        <div class="form-group">
+          <input type="text" name="business" placeholder="Business Name">
+        </div>
+        <div class="form-group">
+          <select name="plan" required>
+            <option value="" disabled selected>Interested in…</option>
+            <option value="Starter ($2,997/mo)">Starter — $2,997/mo</option>
+            <option value="Pro Agent ($5,997/mo)">Pro Agent — $5,997/mo</option>
+            <option value="Enterprise (Custom)">Enterprise — Custom</option>
+            <option value="Not sure yet">Not sure yet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <textarea name="message" placeholder="Tell us briefly about your business and what you need…" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;text-align:center;">Send My Request →</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- THANK YOU MODAL -->
+  <div class="modal-overlay" id="thanksModal">
+    <div class="modal-content" style="text-align:center;">
+      <button class="modal-close" onclick="closeThanks()">&times;</button>
+      <div style="font-size:48px;margin-bottom:16px;">🎉</div>
+      <h3 class="modal-title">We got your request!</h3>
+      <p class="modal-sub">Our team will reach out within 24 hours to schedule your free strategy call. Keep an eye on your inbox.</p>
+      <button class="btn-primary" onclick="closeThanks()" style="margin-top:24px;">Got It →</button>
+    </div>
+  </div>
 
   <!-- FOOTER -->
   <footer>
@@ -1864,6 +1999,44 @@
   </footer>
 
   <script>
+    // ── CONTACT MODAL ──
+    function openModal(e, plan) {
+      e && e.preventDefault();
+      closeNav();
+      const modal = document.getElementById('contactModal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      if (plan) {
+        const sel = modal.querySelector('select[name="plan"]');
+        for (let o of sel.options) { if (o.value === plan) { o.selected = true; sel.style.color = 'var(--white)'; break; } }
+      }
+    }
+    function closeModal() {
+      document.getElementById('contactModal').classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    function closeThanks() {
+      document.getElementById('thanksModal').classList.remove('active');
+      document.body.style.overflow = '';
+      // Clear URL param
+      history.replaceState(null, '', window.location.pathname);
+    }
+    // Close modal on overlay click
+    document.getElementById('contactModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+    document.getElementById('thanksModal').addEventListener('click', function(e) {
+      if (e.target === this) closeThanks();
+    });
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { closeModal(); closeThanks(); }
+    });
+    // Show thanks modal if redirected back
+    if (new URLSearchParams(window.location.search).get('thanks') === '1') {
+      document.getElementById('thanksModal').classList.add('active');
+    }
+
     // ── NAV SCROLL ──
     const navbar = document.getElementById('navbar');
     let lastScroll = 0;
